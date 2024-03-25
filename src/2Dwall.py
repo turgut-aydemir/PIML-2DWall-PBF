@@ -68,7 +68,7 @@ def generate_points(p=[],f=[]):
  
     domain_pts,_ = sampling_uniform_2D([1.,.25],x_min, [x_max[0],x_max[1]-1.5,x_max[2]],'domain',t[1:],e=0.01)
     
-    init_data = np.load('../data/wall/2D_init.npy').T
+    init_data = np.load('../data/wall/2D_init.npy').T #this data is under \data\3_hybrid folder
 
     p.extend([torch.tensor(bound_x_neg,requires_grad=True,dtype=torch.float).to(device),
               torch.tensor(bound_x_pos,requires_grad=True,dtype=torch.float).to(device),
