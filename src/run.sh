@@ -6,5 +6,5 @@
 #nohup python3 bareplate.py --output 'nodata' --iters 50000  --device '0'
 #nohup python3 bareplate.py --output 'transfer' --iters 10000 --device '1' --valid '../data/bareplate/data_400W.npy' --pretrain '../results/bareplate/nodata.pt' --v 8. --P 400. --t_end 3.75
 #nohup python3 bareplate.py --output 'notransfer' --iters 50000 --device '1' --valid '../data/bareplate/data_400W.npy' --v 8. --P 400. --t_end 3.75
-nohup python3 2Dwall.py --iters 100000 
+nohup python3 2Dwall.py --iters 100000
 nohup python3 2Dwall.py --iters 5000 --task 'calibration'

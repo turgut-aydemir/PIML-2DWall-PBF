@@ -31,10 +31,10 @@ def PDE(x,y,t,net):
     T_yy = grad(T_y,y,create_graph=True,grad_outputs=torch.ones_like(T_y))[0]
     
     
-    Cp = a1/1000*(T-298) + b1
+    Cp = a1/1000*(T-298) + b1 # Kg to g
     k = a2*T + b2
     
-    h = ha*y/1e5 + hb
+    h = ha*y/1e5 + hb # micrometers (μm), centimeters (cm)
 
     f = rho*Cp*T_t - k*(T_xx+T_yy) + 2*h/thickness*(T-T_ref) + 2*Rboltz*emiss/thickness*(T**4-T_ref**4)
     return f
@@ -68,7 +68,7 @@ def generate_points(p=[],f=[]):
  
     domain_pts,_ = sampling_uniform_2D([1.,.25],x_min, [x_max[0],x_max[1]-1.5,x_max[2]],'domain',t[1:],e=0.01)
     
-    init_data = np.load('../data/wall/2D_init.npy').T #this data is under \data\3_hybrid folder
+    init_data = np.load('2D_init.npy').T #this data is under \data\3_hybrid folder
 
     p.extend([torch.tensor(bound_x_neg,requires_grad=True,dtype=torch.float).to(device),
               torch.tensor(bound_x_pos,requires_grad=True,dtype=torch.float).to(device),
@@ -86,7 +86,7 @@ def generate_points(p=[],f=[]):
 def load_data(p=[],f=[]):
 
 # 
-    data = np.load('../data/wall/2D_IR_data.npy').T
+    data = np.load('2D_IR_data.npy').T
     
     ind = (data[:,2]<7)*(data[:,1]>28.5)
     data1 = data[ind,:]
@@ -153,8 +153,6 @@ else:
 
 iterations = args.iters
 
-
-
 point_sets,flags = generate_points([],[])
 point_sets,flags = load_data(point_sets,flags)
 
@@ -163,7 +161,7 @@ info_num=100
 w=[1.,1e-4,1.,1e-4]
 
 ##validation data
-data = np.load('../data/wall/2D_IR_data.npy').T
+data = np.load('2D_IR_data.npy').T
 ind = (data[:,2]>0)*(data[:,2]<7)*(data[:,1]<28.5)
 data = data[ind,:]
 test_in = torch.tensor(data[:,0:3],requires_grad=False,dtype=torch.float).to(device)
