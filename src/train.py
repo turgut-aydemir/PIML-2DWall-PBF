@@ -327,48 +327,55 @@ def train2DTurgut(net, PDE, BC, point_sets, flags, iterations=50000, lr=5e-4, in
         cost.backward()
         optimizer.step()
 
-        # Save plots at every 10,000 iterations
-        if epoch % 10000 == 0 and epoch > 0:
-            # After training, generate full-field temperature predictions at t=1, t=2, t=3
-            x = np.linspace(0, 1, 55)
-            y = np.linspace(0, 1, 55)
-            xx, yy = np.meshgrid(x, y)
-            grid_points = np.vstack([xx.ravel(), yy.ravel()]).T
+    # After training, generate full-field temperature predictions at t=1, t=2, t=3
+    # Create a grid for the full field (55x55 pixels)
+    x = np.linspace(0, 1, 55)  # Modify the range based on your domain
+    y = np.linspace(0, 1, 55)  # Modify the range based on your domain
+    xx, yy = np.meshgrid(x, y)
+    grid_points = np.vstack([xx.ravel(), yy.ravel()]).T
 
-            t_steps = [1, 2, 3]
-            predictions = {}
+    # Generate predictions for t=1, t=2, t=3
+    t_steps = [1, 2, 3]
+    predictions = {}
 
-            for t in t_steps:
-                grid_tensor = torch.tensor(grid_points, dtype=torch.float32)
-                grid_tensor_with_time = torch.cat([grid_tensor, torch.full((grid_tensor.shape[0], 1), float(t))], dim=1)
-                full_field_pred = net(grid_tensor_with_time).detach().numpy()
-                predictions[f't={t}'] = full_field_pred.reshape(55, 55)
+    for t in t_steps:
+        # Convert the grid to a tensor
+        grid_tensor = torch.tensor(grid_points, dtype=torch.float32)
 
-                if actual_temps is not None:
-                    actual_temp = actual_temps[f't={t}']
-                    predicted_temps_reshaped = full_field_pred.reshape(55, 55)
+        # If your model expects time as input, concatenate the time value
+        grid_tensor_with_time = torch.cat([grid_tensor, torch.full((grid_tensor.shape[0], 1), float(t))], dim=1)
 
-                    plt.figure(figsize=(8, 6))
-                    plt.subplot(1, 2, 1)
-                    plt.title(f"Predicted Temperature at time = {t} s")
-                    plt.imshow(predicted_temps_reshaped, cmap='hot', interpolation='nearest')
-                    plt.colorbar()
-                    plt.subplot(1, 2, 2)
-                    plt.title(f"Actual Temperature at time = {t} s")
-                    plt.imshow(actual_temp, cmap='hot', interpolation='nearest')
-                    plt.colorbar()
-                    plt.suptitle(f"Cycle: {cycle_name}, Epoch: {epoch + 1}")
-                    plt.savefig(f"{cycle_name}_epoch_{epoch + 1}_time_{t}_iter_{epoch}.png")
-                    plt.close()
+        # Get the model prediction for the full field
+        full_field_pred = net(grid_tensor_with_time).detach().numpy()  # Convert to numpy array
+        predictions[f't={t}'] = full_field_pred.reshape(55, 55)  # Reshape to 55x55 grid
 
-                    error = predicted_temps_reshaped - actual_temp
-                    plt.figure(figsize=(6, 6))
-                    plt.title(f"Error (Predicted - Actual) at time = {t} s")
-                    plt.imshow(error, cmap='coolwarm', interpolation='nearest')
-                    plt.colorbar()
-                    plt.suptitle(f"Cycle: {cycle_name}, Epoch: {epoch + 1}")
-                    plt.savefig(f"{cycle_name}_epoch_{epoch + 1}_error_time_{t}_iter_{epoch}.png")
-                    plt.close()
+        # Visualization and comparison with actual temperature
+        if actual_temps is not None:
+            actual_temp = actual_temps[f't={t}']  # Get the actual temperature for the given time step
+            predicted_temps_reshaped = full_field_pred.reshape(55, 55)
+
+            plt.figure(figsize=(8, 6))
+            plt.subplot(1, 2, 1)
+            plt.title(f"Predicted Temperature at time = {t} s")
+            plt.imshow(predicted_temps_reshaped, cmap='hot', interpolation='nearest')
+            plt.colorbar()
+            plt.subplot(1, 2, 2)
+            plt.title(f"Actual Temperature at time = {t} s")
+            plt.imshow(actual_temp, cmap='hot', interpolation='nearest')
+            plt.colorbar()
+            plt.suptitle(f"Cycle: {cycle_name}, Epoch: {epoch + 1}")
+            plt.savefig(f"{cycle_name}_epoch_{epoch + 1}_time_{t}s.png")  # Save plot with cycle and epoch info
+            plt.close()
+
+            # Optionally: Compute the error (predicted - actual) for the given time step
+            error = predicted_temps_reshaped - actual_temp
+            plt.figure(figsize=(6, 6))
+            plt.title(f"Error (Predicted - Actual) at time = {t} s")
+            plt.imshow(error, cmap='coolwarm', interpolation='nearest')
+            plt.colorbar()
+            plt.suptitle(f"Cycle: {cycle_name}, Epoch: {epoch + 1}")
+            plt.savefig(f"{cycle_name}_epoch_{epoch + 1}_error_time_{t}s.png")  # Save error plot
+            plt.close()
 
     # Save the predictions as a .npy file
     np.save(f"{cycle_name}_full_field_temperature_predictions.npy", predictions)
