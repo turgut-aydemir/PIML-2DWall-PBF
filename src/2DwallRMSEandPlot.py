@@ -69,7 +69,7 @@ def generate_points(p=[], f=[]):
 
     domain_pts, _ = sampling_uniform_2D([1., .25], x_min, [x_max[0], x_max[1] - 1.5, x_max[2]], 'domain', t[1:], e=0.01)
 
-    init_dataTimeAdjust = np.load('Mid1Kelvin.npy').T
+    init_dataTimeAdjust = np.load('Later1_Kelvin.npy').T
     indTimeAdjust = init_dataTimeAdjust[:, 2] == 2.8666667 # Initial Condition
     init_data = init_dataTimeAdjust[indTimeAdjust, :]
 
@@ -84,7 +84,7 @@ def generate_points(p=[], f=[]):
     return p, f
 
 def load_data(p=[], f=[]):
-    data = np.load('Mid1Kelvin.npy').T
+    data = np.load('Later1_Kelvin.npy').T
 
     ind = (data[:, 2] > 2.85) * (data[:, 2] < 3.0) * (data[:, 1] < 3)
     data1 = data[ind, :]
@@ -102,7 +102,7 @@ def load_data(p=[], f=[]):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--device', type=str, default='0', help='GPU name')
-    parser.add_argument('--iters', type=int, default=20000, help='number of iters')
+    parser.add_argument('--iters', type=int, default=100, help='number of iters')
     parser.add_argument('--lr', type=float, default=2e-4, help='learning rate')
     parser.add_argument('--task', type=str, default='baseline', help='baseline or calibration')
 
@@ -156,13 +156,13 @@ info_num = 100
 w = [1., 1e-4, 1., 1e-4]
 
 ##validation data
-data = np.load('Mid1Kelvin.npy').T
+data = np.load('Later1_Kelvin.npy').T
 ind = (data[:, 2] > 2.85) * (data[:, 2] < 3.0) * (data[:, 1] > 3)
 data = data[ind, :]
 test_in = torch.tensor(data[:, 0:3], requires_grad=False, dtype=torch.float).to(device)
 test_out = torch.tensor(data[:, 3:4], requires_grad=False, dtype=torch.float).to(device)
 
-init_dataTimeAdjust = np.load('Mid1Kelvin.npy').T
+init_dataTimeAdjust = np.load('Later1_Kelvin.npy').T
 indTimeAdjust1 = init_dataTimeAdjust[:, 2] == 1
 indTimeAdjust2 = init_dataTimeAdjust[:, 2] == 2
 indTimeAdjust3 = init_dataTimeAdjust[:, 2] == 3
@@ -175,7 +175,7 @@ actual_temps = {
         't=3': t3_data
     }
 
-cycle_name = 'Mid1'
+cycle_name = 'Later1'
 l_history, err_history = train2DTurgut(net, PDE, BC, point_sets, flags, iterations, lr=lr, info_num=100,
                                  test_in=test_in, test_out=test_out, w=w,
                                  inv_params=inv_params,cycle_name=cycle_name, actual_temps=actual_temps)

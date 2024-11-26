@@ -5,6 +5,7 @@ import time
 import matplotlib.pyplot as plt  # Import matplotlib for plotting
 import torch.nn as nn
 import time
+from scipy.interpolate import griddata
 
 def loss(f,target=None):
     if target == None:
@@ -13,6 +14,12 @@ def loss(f,target=None):
         return torch.sum(torch.square(f-target))/f.shape[0]
     else:
         return nn.MSELoss()(f,target)
+
+def interpolate_to_grid(actual_data, x_grid, y_grid):
+    points = actual_data[:, :2]  # Assuming the first two columns are spatial coordinates (x, y)
+    values = actual_data[:, 3]  # Assuming the 4th column contains temperature values
+    grid_z = griddata(points, values, (x_grid, y_grid), method='linear')
+    return grid_z
 
 def rmse(pred, actual):
     return torch.sqrt(torch.mean((pred - actual)**2))
@@ -352,24 +359,25 @@ def train2DTurgut(net, PDE, BC, point_sets, flags, iterations=50000, lr=5e-4, in
         # Visualization and comparison with actual temperature
         if actual_temps is not None:
             actual_temp = actual_temps[f't={t}']  # Get the actual temperature for the given time step
+            actual_temp_interpolated = interpolate_to_grid(actual_temp, xx, yy)
             predicted_temps_reshaped = full_field_pred.reshape(55, 55)
 
-            plt.figure(figsize=(8, 6))
+            plt.figure(figsize=(16, 12))
             plt.subplot(1, 2, 1)
             plt.title(f"Predicted Temperature at time = {t} s")
             plt.imshow(predicted_temps_reshaped, cmap='hot', interpolation='nearest')
             plt.colorbar()
             plt.subplot(1, 2, 2)
             plt.title(f"Actual Temperature at time = {t} s")
-            plt.imshow(actual_temp, cmap='hot', interpolation='nearest')
+            plt.imshow(actual_temp_interpolated, cmap='hot', interpolation='nearest')
             plt.colorbar()
             plt.suptitle(f"Cycle: {cycle_name}, Epoch: {epoch + 1}")
             plt.savefig(f"{cycle_name}_epoch_{epoch + 1}_time_{t}s.png")  # Save plot with cycle and epoch info
             plt.close()
 
             # Optionally: Compute the error (predicted - actual) for the given time step
-            error = predicted_temps_reshaped - actual_temp
-            plt.figure(figsize=(6, 6))
+            error = predicted_temps_reshaped - actual_temp_interpolated
+            plt.figure(figsize=(12, 12))
             plt.title(f"Error (Predicted - Actual) at time = {t} s")
             plt.imshow(error, cmap='coolwarm', interpolation='nearest')
             plt.colorbar()
