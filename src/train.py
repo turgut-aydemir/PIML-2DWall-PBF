@@ -362,13 +362,13 @@ def train2DTurgut(net, PDE, BC, point_sets, flags, iterations=50000, lr=5e-4, in
             actual_temp_interpolated = interpolate_to_grid(actual_temp, xx, yy)
             predicted_temps_reshaped = full_field_pred.reshape(55, 55)
 
-            plt.figure(figsize=(16, 12))
+            plt.figure(figsize=(8, 6))
             plt.subplot(1, 2, 1)
-            plt.title(f"Predicted Temperature at time = {t} s")
+            plt.title(f"Tpred at time = {t} s")
             plt.imshow(predicted_temps_reshaped, cmap='hot', interpolation='nearest')
             plt.colorbar()
             plt.subplot(1, 2, 2)
-            plt.title(f"Actual Temperature at time = {t} s")
+            plt.title(f"Tact at time = {t} s")
             plt.imshow(actual_temp_interpolated, cmap='hot', interpolation='nearest')
             plt.colorbar()
             plt.suptitle(f"Cycle: {cycle_name}, Epoch: {epoch + 1}")
@@ -377,8 +377,8 @@ def train2DTurgut(net, PDE, BC, point_sets, flags, iterations=50000, lr=5e-4, in
 
             # Optionally: Compute the error (predicted - actual) for the given time step
             error = predicted_temps_reshaped - actual_temp_interpolated
-            plt.figure(figsize=(12, 12))
-            plt.title(f"Error (Predicted - Actual) at time = {t} s")
+            plt.figure(figsize=(6, 6))
+            plt.title(f"Error at time = {t} s")
             plt.imshow(error, cmap='coolwarm', interpolation='nearest')
             plt.colorbar()
             plt.suptitle(f"Cycle: {cycle_name}, Epoch: {epoch + 1}")
