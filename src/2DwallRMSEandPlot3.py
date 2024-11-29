@@ -69,7 +69,7 @@ def generate_points(p=[], f=[]):
 
     domain_pts, _ = sampling_uniform_2D([1., .25], x_min, [x_max[0], x_max[1] - 1.5, x_max[2]], 'domain', t[1:], e=0.01)
 
-    init_dataTimeAdjust = np.load('Mid1.npy').T
+    init_dataTimeAdjust = np.load('Mid1Kelvin.npy').T
     indTimeAdjust = init_dataTimeAdjust[:, 2] == 2.8666667 # Initial Condition
     init_data = init_dataTimeAdjust[indTimeAdjust, :]
 
@@ -84,7 +84,7 @@ def generate_points(p=[], f=[]):
     return p, f
 
 def load_data(p=[], f=[]):
-    data = np.load('Mid1.npy').T
+    data = np.load('Mid1Kelvin.npy').T
 
     ind = (data[:, 2] > 2.85) * (data[:, 2] < 3.0) * (data[:, 1] < 3)
     data1 = data[ind, :]
@@ -156,13 +156,13 @@ info_num = 100
 w = [1., 1e-4, 1., 1e-4]
 
 ##validation data
-data = np.load('Mid1.npy').T
+data = np.load('Mid1Kelvin.npy').T
 ind = (data[:, 2] > 2.85) * (data[:, 2] < 3.0) * (data[:, 1] > 3)
 data = data[ind, :]
 test_in = torch.tensor(data[:, 0:3], requires_grad=False, dtype=torch.float).to(device)
 test_out = torch.tensor(data[:, 3:4], requires_grad=False, dtype=torch.float).to(device)
 
-init_dataTimeAdjust = np.load('Mid1.npy').T
+init_dataTimeAdjust = np.load('Mid1Kelvin.npy').T
 indTimeAdjust1 = init_dataTimeAdjust[:, 2] == 1
 indTimeAdjust2 = init_dataTimeAdjust[:, 2] == 2
 indTimeAdjust3 = init_dataTimeAdjust[:, 2] == 3
