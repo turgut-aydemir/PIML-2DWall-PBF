@@ -100,7 +100,7 @@ def load_data(p=[], f=[]):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--device', type=str, default='0', help='GPU name')
-    parser.add_argument('--iters', type=int, default=10000, help='number of iters')
+    parser.add_argument('--iters', type=int, default=5000, help='number of iters')
     parser.add_argument('--lr', type=float, default=2e-4, help='learning rate')
     parser.add_argument('--task', type=str, default='baseline', help='baseline or calibration')
 
